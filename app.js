@@ -26,12 +26,21 @@ app.use(shopRoutes);
 
 app.use(errorController.get404);
 
-Product.belongsTo(User, {constraints: true, onDelete: 'CASCADE'});
+Product.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
 
-sequelize.sync({force: true})
-    .then(()=>{
-    app.listen(3000);
+sequelize.sync(/*{force: true}*/)
+    .then(() => {
+        User.findAll()
+            .then((users) => {
+                if (users.length === 0) {
+                    return User.create({ username: 'Ibrahim', email: 'ibrahim@gmail.com' });
+                } else {
+                    return users[0];
+                }
+            })
+            .catch((err) => { console.log(err); })
+        app.listen(3000);
     })
-    .catch((err)=>{console.log(err);})
+    .catch((err) => { console.log(err); })
 
 
