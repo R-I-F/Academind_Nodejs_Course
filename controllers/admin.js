@@ -15,7 +15,7 @@ exports.getEditProduct = (req, res, next) => {
   if (!editMode) {
     res.redirect('/');
   }
-  Product.findByPk(id).then((product)=>{
+  Product.findByPk(id).then((product) => {
     if (!product) {
       res.redirect('/');
     }
@@ -25,32 +25,35 @@ exports.getEditProduct = (req, res, next) => {
       editing: editMode,
       product: product
     });
-  }).catch((err)=>{console.log(err);});}
+  }).catch((err) => { console.log(err); });
+}
 
 exports.postEditProduct = (req, res, next) => {
   const prodId = req.params.productId;
   Product.findByPk(prodId)
-  .then((product)=>{
-    product.title = req.body.title;
-    product.imageUrl = req.body.imageUrl;
-    product.description = req.body.description;
-    product.price = req.body.price;
-    return product.save();
-  })
-  .then((result)=>{
-    res.redirect('/');
-  })
-  .catch((err)=>{console.log(err);})
+    .then((product) => {
+      product.title = req.body.title;
+      product.imageUrl = req.body.imageUrl;
+      product.description = req.body.description;
+      product.price = req.body.price;
+      return product.save();
+    })
+    .then((result) => {
+      res.redirect('/');
+    })
+    .catch((err) => { console.log(err); })
 };
 
 exports.deleteProduct = (req, res, next) => {
   const prodId = req.params.productId;
   Product.findByPk(prodId)
-    .then((product)=>{
+    .then((product) => {
       return product.destroy()
-    }).then((result)=>
+    })
+    .then((result) =>{
       res.redirect('/admin/products')
-    ).catch((err)=>{console.log(err);});
+    })
+    .catch((err) => { console.log(err); });
 };
 
 exports.postAddProduct = (req, res, next) => {
@@ -60,9 +63,9 @@ exports.postAddProduct = (req, res, next) => {
   const description = req.body.description;
   const id = null;
   Product.create({ title: title, price: price, imageUrl: imageUrl, description: description })
-    .then((result) => { 
+    .then((result) => {
       res.redirect('/admin/products');
-     })
+    })
     .catch((err) => { console.log(err); });
 };
 
@@ -73,5 +76,5 @@ exports.getProducts = (req, res, next) => {
       pageTitle: 'Admin Products',
       path: '/admin/products'
     });
-  }).catch((err)=>{console.log(err);})
+  }).catch((err) => { console.log(err); })
 };
