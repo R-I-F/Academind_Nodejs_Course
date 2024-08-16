@@ -45,20 +45,24 @@ exports.postEditProduct = (req, res, next) => {
 
 exports.deleteProduct = (req, res, next) => {
   const prodId = req.params.productId;
-  console.log(prodId);
-  Product.delete(prodId);
-  res.redirect('/');
+  Product.findByPk(prodId)
+    .then((product)=>{
+      return product.destroy()
+    }).then((result)=>
+      res.redirect('/admin/products')
+    ).catch((err)=>{console.log(err);});
 };
 
 exports.postAddProduct = (req, res, next) => {
-  console.log(req.body);
   const title = req.body.title;
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
   const description = req.body.description;
   const id = null;
   Product.create({ title: title, price: price, imageUrl: imageUrl, description: description })
-    .then((result) => { console.log(result); })
+    .then((result) => { 
+      res.redirect('/admin/products');
+     })
     .catch((err) => { console.log(err); });
 };
 
