@@ -58,9 +58,9 @@ sequelize.sync(
             return users[0];
         }
     })
-    .then((user)=>{
-        return user.createCart();
-    })
+    // .then((user)=>{
+    //     return user.createCart();
+    // })
     .then((result)=>{
         app.listen(3000);
     })

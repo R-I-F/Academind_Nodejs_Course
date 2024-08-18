@@ -26,13 +26,6 @@ exports.getProduct = (req, res, next) => {
       console.log(product);
     })
     .catch((err) => { console.log(err); })
-  // Product.findAll({where: {id: prodId}}).then((product)=>{
-  //   res.render('shop/product-detail', {
-  //           product: product[0],
-  //           pageTitle: 'product-detail',
-  //           path: `/products/${prodId}`
-  //         })}
-  // ).catch((err)=>{console.log(err);})
 }
 
 exports.getIndex = (req, res, next) => {
@@ -72,10 +65,32 @@ exports.postCartDeleteItem = (req, res, next) => {
 
 exports.postCart = (req, res, next) => {
   const prodId = req.body.productId
-  Product.findById(prodId, (product) => {
-    Cart.addProduct(product.id, product.price)
-  });
-  res.redirect('/cart');
+  let fetchedCart;
+  // Product.findById(prodId, (product) => {
+  //   Cart.addProduct(product.id, product.price)
+  // });
+  // res.redirect('/cart');
+  // check if the the productId exists in the carItems table, if yes then increment its qty by 1 , if no then add the product with qty 1
+  req.user
+    .getCart()
+    .then((cart)=>{
+      fetchedCart = cart
+      return cart.getProducts({where : {id : prodId}})
+    })
+    .then((products)=>{
+      if(products.length > 0){
+        // products[0].qty ++ ;
+        console.log('to be continued');
+      } else {
+        Product.findByPk(prodId)
+        .then((product)=>{
+          fetchedCart.addProduct(product, { through: { qty: 1 } });
+        })
+        .catch((err)=>{console.log(err);});
+      }
+      res.redirect('/')
+    })
+    .catch((err)=>{console.log(err);})
 };
 
 exports.getOrders = (req, res, next) => {
