@@ -41,6 +41,7 @@ Product.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
 User.hasMany(Product);
 
 Product.belongsToMany(Cart, {through : CartItem});
+Cart.belongsToMany(Product, { through: CartItem });
 
 
 sequelize.sync(
