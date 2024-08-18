@@ -2,6 +2,8 @@ const path = require('path');
 const sequelize = require('./util/database');
 const Product = require('./models/product');
 const User = require('./models/user');
+const Cart = require('./models/cart');
+const CartItem = require('./models/cartItem');
 
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -38,7 +40,12 @@ app.use(errorController.get404);
 Product.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
 User.hasMany(Product);
 
-sequelize.sync(/*{force: true}*/)
+Product.belongsToMany(Cart, {through : CartItem});
+
+
+sequelize.sync(
+    {force: true}
+)
     .then(() => {
         User.findAll()
             .then((users) => {
