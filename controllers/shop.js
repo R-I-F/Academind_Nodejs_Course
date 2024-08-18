@@ -47,22 +47,16 @@ exports.getIndex = (req, res, next) => {
 };
 
 exports.getCart = (req, res, next) => {
-  Cart.getCart((cart) => {
-    Product.fetchAll((products) => {
-      const cartProducts = [];
-      for (let product of products) {
-        const productInCart = cart.products.find((cartProd) => cartProd.id == product.id);
-        if (productInCart) {
-          cartProducts.push({ productData: product, qty: productInCart.qty })
-        }
-      }
+  req.user
+    .getCart()
+    .then((cart)=>{
       res.render('shop/cart', {
-        path: '/cart',
-        pageTitle: 'Your Cart',
-        products: cartProducts
-      });
-    });
-  });
+              path: '/cart',
+              pageTitle: 'Your Cart',
+              products: cart
+            });
+    })
+    .catch((err)=>{console.log(err);});
 };
 
 exports.postCartDeleteItem = (req, res, next) => {

@@ -47,18 +47,21 @@ User.hasOne(Cart);
 
 
 sequelize.sync(
-    {force: true}
+    // {force: true}
 )
     .then(() => {
-        User.findAll()
-            .then((users) => {
-                if (users.length === 0) {
-                    return User.create({ username: 'Ibrahim', email: 'ibrahim@gmail.com' });
-                } else {
-                    return users[0];
-                }
-            })
-            .catch((err) => { console.log(err); })
+       return User.findAll()})
+    .then((users) => {
+        if (users.length === 0) {
+            return User.create({ username: 'Ibrahim', email: 'ibrahim@gmail.com' });
+        } else {
+            return users[0];
+        }
+    })
+    .then((user)=>{
+        return user.createCart();
+    })
+    .then((result)=>{
         app.listen(3000);
     })
     .catch((err) => { console.log(err); })
