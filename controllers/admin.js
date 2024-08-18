@@ -39,7 +39,7 @@ exports.postEditProduct = (req, res, next) => {
       return product.save();
     })
     .then((result) => {
-      res.redirect('/');
+      res.redirect('/admin/proucts');
     })
     .catch((err) => { console.log(err); })
 };
@@ -71,7 +71,8 @@ exports.postAddProduct = (req, res, next) => {
 };
 
 exports.getProducts = (req, res, next) => {
-  Product.findAll().then(products => {
+  req.user.getProducts()
+  .then(products => {
     res.render('admin/products', {
       prods: products,
       pageTitle: 'Admin Products',
