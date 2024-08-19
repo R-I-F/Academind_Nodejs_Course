@@ -56,10 +56,18 @@ exports.getCart = (req, res, next) => {
 
 exports.postCartDeleteItem = (req, res, next) => {
   const prodId = req.body.productId;
-  Product.findById(prodId, (product) => {
-    Cart.deleteProduct(prodId, product.price);
-    res.redirect('/cart')
+  req.user
+  .getCart()
+  .then((cart)=>{
+    return cart.getProducts({where : { id: prodId }});
   })
+  .then((product)=>{
+    return product[0].cartItem.destroy();
+  })
+  .then((result)=>{
+    res.redirect('/cart');
+  })
+  .catch((err)=>{ console.log(err); });
 };
 
 exports.postCart = (req, res, next) => {
@@ -74,7 +82,7 @@ exports.postCart = (req, res, next) => {
       return cart.getProducts({where : {id : prodId}})
     })
     .then((product)=>{
-      if(product){
+      if(product.length > 0){
         const prodQty = product[0].cartItem.qty;
         newQty += prodQty;
         console.log(newQty);
