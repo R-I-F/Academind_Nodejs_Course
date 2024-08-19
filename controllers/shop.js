@@ -1,5 +1,6 @@
 const Product = require('../models/product');
 const Cart = require('../models/cart');
+const Order = require('../models/order');
 
 exports.getProducts = (req, res, next) => {
 
@@ -103,6 +104,46 @@ exports.getOrders = (req, res, next) => {
     pageTitle: 'Your Orders'
   });
 };
+
+exports.postOrders = (req, res, next)=>{
+  let order;
+  let fetchedCart;
+  req.user
+  // create order
+  .createOrder()
+  .then(()=>{
+    return Order.findAll({
+      where: { userId: req.user.id }, 
+      order: [['createdAt', 'DESC']],  
+      limit: 1
+    })
+  })
+  .then((ord)=>{
+    if(ord.length > 0 ){
+      order = ord[0];
+      return req.user.getCart()
+    }
+    else {
+      throw Error('No order found');
+    }
+  })
+  .then((cart)=>{
+    fetchedCart = cart;
+    return cart.getProducts()
+  })
+  .then((products)=>{
+    return Promise.all(
+      products.map(prod => order.addProduct(prod, { through: {qty : prod.cartItem.qty} }))
+    );
+  })
+  .then(()=>{
+    return fetchedCart.setProducts(null);
+  })
+  .then(()=>{
+    res.redirect('/orders');
+  })
+  .catch((err)=>{console.log(err);})
+}
 
 exports.getCheckout = (req, res, next) => {
   res.render('shop/checkout', {
