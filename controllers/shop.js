@@ -99,10 +99,18 @@ exports.postCart = (req, res, next) => {
 };
 
 exports.getOrders = (req, res, next) => {
-  res.render('shop/orders', {
-    path: '/orders',
-    pageTitle: 'Your Orders'
-  });
+
+  req.user
+    .getOrders( {include: ['products']} )
+    .then((orders)=>{
+      console.log(orders[0].products);
+      res.render('shop/orders', {
+        path: '/orders',
+        pageTitle: 'Your Orders',
+        orders: orders
+      });
+    })
+
 };
 
 exports.postOrders = (req, res, next)=>{
