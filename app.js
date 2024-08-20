@@ -13,7 +13,8 @@ app.set('views', 'views');
 // const adminRoutes = require('./routes/admin');
 // const shopRoutes = require('./routes/shop');
 
-const mongoConnect = require('./util/database');
+const mongoConnect = require('./util/database').mongoConnect;
+const getDb = require('./util/database').getDb;
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -32,9 +33,9 @@ app.use((req, res, next) => {
 
 app.use(errorController.get404);
 
-mongoConnect((client)=>{
+mongoConnect(()=>{
   app.listen(3000);
-  console.log(client);
+
 })
 
 
