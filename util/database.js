@@ -4,10 +4,10 @@ const MongoClient = mongodb.MongoClient;
 let _db;
 
 const mongoConnect = (cb) => {
-  MongoClient.connect('mongodb+srv://ibrahim:r9GQE1Isy4v3wXuC@cluster0.moqb1.mongodb.net/?retryWrites=true&w=majority&appName=cluster0')
+  MongoClient.connect('mongodb+srv://ibrahim:r9GQE1Isy4v3wXuC@cluster0.moqb1.mongodb.net/shop?retryWrites=true&w=majority&appName=cluster0')
   .then((result) => {
     _db = result.db()
-     cb(result); 
+    cb();
   })
   .catch((err) => {
      console.log(err); 
