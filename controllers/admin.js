@@ -14,7 +14,8 @@ exports.postAddProduct = (req, res, next) => {
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
   const description = req.body.description;
-  const p = new Product(title, price, description, imageUrl);
+  const userId = new ObjectId(req.user._id)
+  const p = new Product(title, price, description, imageUrl, null, userId);
   p.save()
     .then((result)=>{
       res.redirect('/products');
@@ -50,8 +51,9 @@ exports.postEditProduct = (req, res, next) => {
   const updatedPrice = req.body.price;
   const updatedImageUrl = req.body.imageUrl;
   const updatedDesc = req.body.description;
+  const userId = new ObjectId(req.user._id)
 
-  const newProduct = new Product(updatedTitle, updatedPrice, updatedDesc, updatedImageUrl, prodId)
+  const newProduct = new Product(updatedTitle, updatedPrice, updatedDesc, updatedImageUrl, prodId, userId)
   newProduct.save()
     .then(result => {
       console.log('UPDATED PRODUCT!');
