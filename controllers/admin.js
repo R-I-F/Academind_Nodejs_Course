@@ -15,7 +15,7 @@ exports.postAddProduct = (req, res, next) => {
   const price = req.body.price;
   const description = req.body.description;
   const userId = new ObjectId(req.user._id)
-  const p = new Product(title, price, description, imageUrl, null, userId);
+  const p = new Product({title: title, price: price, description: description, imageUrl: imageUrl});
   p.save()
     .then((result)=>{
       res.redirect('/products');
