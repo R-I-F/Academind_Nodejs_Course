@@ -1,5 +1,6 @@
 const path = require('path');
 require('dotenv').config();
+const mongoose = require('mongoose');
 
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -16,8 +17,6 @@ app.set('views', 'views');
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 
-const mongoConnect = require('./util/database').mongoConnect;
-const getDb = require('./util/database').getDb;
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -36,8 +35,10 @@ app.use(shopRoutes);
 
 app.use(errorController.get404);
 
-mongoConnect(()=>{
-  app.listen(3000);
-})
+mongoose
+.connect(process.env.DRIVER_URL, { useNewUrlParser: true, useUnifiedTopology: true })
+.then(result => app.listen(3000))
+.catch((err) => { console.log(err); });
+
 
 
