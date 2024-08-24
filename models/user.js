@@ -74,6 +74,14 @@ class User {
     })
   }
 
+  getOrders(){
+    const db = getDb();
+    return db
+    .collection('orders')
+    .find({'user._id': this._id})
+    .toArray()
+  }
+
   deleteItemFromCart(prodId){
     const db = getDb();
     const cart = {...this.cart};
