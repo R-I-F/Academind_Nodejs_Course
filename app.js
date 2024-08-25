@@ -21,14 +21,14 @@ const shopRoutes = require('./routes/shop');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// app.use((req, res, next) => {
-//   User.findById('66c5cc8d89f026ce9ca567d7')
-//   .then((user)=>{
-//     req.user = new User(user.username, user.email, user.cart, user._id);
-//     next();
-//   })
-//   .catch((err)=>{ console.log(err); });
-// });
+app.use((req, res, next) => {
+  User.findById('66cafd28e5cea265beba62c1')
+  .then((user)=>{
+    req.user = user;
+    next();
+  })
+  .catch((err)=>{ console.log(err); });
+});
 
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
@@ -38,8 +38,15 @@ app.use(errorController.get404);
 mongoose
 .connect(process.env.DRIVER_URL, { useNewUrlParser: true, useUnifiedTopology: true })
 .then((result) => {
-  const user = new User({name: 'Ibrahim', email: 'ibrahim@gmail.com', cart:{items:[]}});
-  return user.save();
+  User.findOne()
+  .then((user) => {
+    if(!user){
+      const user = new User({name: 'Ibrahim', email: 'ibrahim@gmail.com', cart:{items:[]}});
+      return user.save();
+    }
+    return user;
+  })
+  
 })
 .then(result => app.listen(3000))
 .catch((err) => { console.log(err); });
