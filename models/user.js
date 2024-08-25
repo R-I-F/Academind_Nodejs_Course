@@ -35,6 +35,18 @@ userSchema.methods.addToCart = function(prodId){
   return this.save(); 
 }
 
+userSchema.methods.getCart = function(){
+  // user.cart = { items:[{productId: ObjectId(id), qunatity: 2}] }
+    const newCart = {...this.cart};
+    const productIds = newCart.items.map((cartItem)=>{
+      return cartItem.productId;
+    });
+    return this.populate('cart.items.productId').then((products)=>{
+      return products.cart.items.map((item)=>{ return item.productId })
+    })
+    
+}
+
 module.exports = mongoose.model('User', userSchema);
 
 // const getDb = require('../util/database').getDb;
