@@ -29,7 +29,6 @@ exports.getEditProduct = (req, res, next) => {
   }
   const prodId = req.params.productId;
   Product.findById(prodId)
-    // Product.findById(prodId)
     .then(product => {
       if (!product) {
         return res.redirect('/');
@@ -46,14 +45,14 @@ exports.getEditProduct = (req, res, next) => {
 
 exports.postEditProduct = (req, res, next) => {
   const prodId = req.body.productId;
-  const updatedTitle = req.body.title;
-  const updatedPrice = req.body.price;
-  const updatedImageUrl = req.body.imageUrl;
-  const updatedDesc = req.body.description;
-  const userId = new ObjectId(req.user._id)
-
-  const newProduct = new Product(updatedTitle, updatedPrice, updatedDesc, updatedImageUrl, prodId, userId)
-  newProduct.save()
+  Product.findById(prodId)
+    .then((product) => {
+      product.title = req.body.title;
+      product.price = req.body.price;
+      product.imageUrl = req.body.imageUrl;
+      product.description = req.body.description;
+      return product.save();
+    })
     .then(result => {
       console.log('UPDATED PRODUCT!');
       res.redirect('/admin/products');
