@@ -7,7 +7,7 @@ const bodyParser = require('body-parser');
 
 const errorController = require('./controllers/error');
 
-// const User = require('./models/user')
+const User = require('./models/user')
 
 const app = express();
 
@@ -37,6 +37,10 @@ app.use(errorController.get404);
 
 mongoose
 .connect(process.env.DRIVER_URL, { useNewUrlParser: true, useUnifiedTopology: true })
+.then((result) => {
+  const user = new User({name: 'Ibrahim', email: 'ibrahim@gmail.com', cart:{items:[]}});
+  return user.save();
+})
 .then(result => app.listen(3000))
 .catch((err) => { console.log(err); });
 
