@@ -1,5 +1,5 @@
 const Product = require('../models/product');
-const {ObjectId} = require('mongodb');
+const { ObjectId } = require('mongodb');
 
 exports.getAddProduct = (req, res, next) => {
   res.render('admin/edit-product', {
@@ -15,12 +15,12 @@ exports.postAddProduct = (req, res, next) => {
   const price = req.body.price;
   const description = req.body.description;
   const userId = req.user
-  const p = new Product({title: title, price: price, description: description, imageUrl: imageUrl, userId: userId});
+  const p = new Product({ title: title, price: price, description: description, imageUrl: imageUrl, userId: userId });
   p.save()
-    .then((result)=>{
+    .then((result) => {
       res.redirect('/products');
     })
-    .catch((err)=>{console.log(err);});
+    .catch((err) => { console.log(err); });
 };
 
 exports.getEditProduct = (req, res, next) => {

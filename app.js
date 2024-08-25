@@ -23,11 +23,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use((req, res, next) => {
   User.findById('66cb022573376fbd8f6c1f33')
-  .then((user)=>{
-    req.user = user;
-    next();
-  })
-  .catch((err)=>{ console.log(err); });
+    .then((user) => {
+      req.user = user;
+      next();
+    })
+    .catch((err) => { console.log(err); });
 });
 
 app.use('/admin', adminRoutes);
@@ -36,20 +36,20 @@ app.use(shopRoutes);
 app.use(errorController.get404);
 
 mongoose
-.connect(process.env.DRIVER_URL, { useNewUrlParser: true, useUnifiedTopology: true })
-.then((result) => {
-  User.findOne()
-  .then((user) => {
-    if(!user){
-      const user = new User({name: 'Ibrahim', email: 'ibrahim@gmail.com', cart:{items:[]}});
-      return user.save();
-    }
-    return user;
+  .connect(process.env.DRIVER_URL, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then((result) => {
+    User.findOne()
+      .then((user) => {
+        if (!user) {
+          const user = new User({ name: 'Ibrahim', email: 'ibrahim@gmail.com', cart: { items: [] } });
+          return user.save();
+        }
+        return user;
+      })
+
   })
-  
-})
-.then(result => app.listen(3000))
-.catch((err) => { console.log(err); });
+  .then(result => app.listen(3000))
+  .catch((err) => { console.log(err); });
 
 
 
