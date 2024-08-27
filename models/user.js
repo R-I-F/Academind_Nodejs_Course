@@ -58,32 +58,6 @@ userSchema.methods.deleteItemFromCart = function (prodId) {
   return this.save();
 }
 
-userSchema.methods.addOrder = function(){
-      return this.getCart().then((products)=>{
-        console.log(this._id);
-        const productsSnapShot = products.map((item)=>{ return {
-          title: item.title,
-          price: item.price,
-          description: item.description,
-          imageUrl: item.imageUrl,
-          userId: item.userId,
-          quantity: item.quantity,
-        } })
-        const order = new Order({
-          items: productsSnapShot,
-          user: {
-            userId : this._id,
-            name: this.name
-          }
-        });
-        return order.save();
-      })
-      .then((result) => {
-        this.cart = {items : []};
-        this.save();
-      })
-}
-
 module.exports = mongoose.model('User', userSchema);
 
 
