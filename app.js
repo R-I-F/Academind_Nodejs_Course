@@ -1,13 +1,11 @@
 const path = require('path');
 require('dotenv').config();
-const mongoose = require('mongoose');
-
 const express = require('express');
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
 
 const errorController = require('./controllers/error');
-
-const User = require('./models/user')
+const User = require('./models/user');
 
 const app = express();
 
@@ -17,17 +15,16 @@ app.set('views', 'views');
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 
-
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use((req, res, next) => {
-  User.findById('66cb022573376fbd8f6c1f33')
-    .then((user) => {
+  User.findById('66cda5ccccd88d30fde4f7bf')
+    .then(user => {
       req.user = user;
       next();
     })
-    .catch((err) => { console.log(err); });
+    .catch(err => console.log(err));
 });
 
 app.use('/admin', adminRoutes);
@@ -37,19 +34,21 @@ app.use(errorController.get404);
 
 mongoose
   .connect(process.env.DRIVER_URL, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then((result) => {
-    User.findOne()
-      .then((user) => {
-        if (!user) {
-          const user = new User({ name: 'Ibrahim', email: 'ibrahim@gmail.com', cart: { items: [] } });
-          return user.save();
-        }
-        return user;
-      })
-
+  .then(result => {
+    User.findOne().then(user => {
+      if (!user) {
+        const user = new User({
+          name: 'Ibrahim',
+          email: 'Ibrahim@test.com',
+          cart: {
+            items: []
+          }
+        });
+        user.save();
+      }
+    });
+    app.listen(3000);
   })
-  .then(result => app.listen(3000))
-  .catch((err) => { console.log(err); });
-
-
-
+  .catch(err => {
+    console.log(err);
+  });
