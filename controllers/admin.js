@@ -10,7 +10,7 @@ exports.getAddProduct = (req, res, next) => {
 };
 
 exports.postAddProduct = (req, res, next) => {
-  console.log(`we are posting a product, user is ${req.session.user}`);
+  console.log(`we are posting a product, user is ${req.user}`);
   const title = req.body.title;
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
@@ -20,7 +20,7 @@ exports.postAddProduct = (req, res, next) => {
     price: price,
     description: description,
     imageUrl: imageUrl,
-    userId: req.session.user
+    userId: req.user
   });
   product
     .save()
