@@ -24,21 +24,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({secret: 'my secret', resave: false, saveUninitialized: false, store: store}));
 
-app.use((req, res, next) => {
-  if(req.session.isLoggedIn) {
-    console.log('defining user');
-    User.findById('66cda5ccccd88d30fde4f7bf')
-      .then(user => {
-        req.user = user;
-      }).then((result)=>{
-        next();
-      })
-      .catch(err => console.log(err));
-    }
-    else {
-      res.redirect('/404')
-    }
-  });
 
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
