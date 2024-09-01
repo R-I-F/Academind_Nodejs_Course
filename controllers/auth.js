@@ -5,7 +5,7 @@ exports.getLogin = (req, res, next) => {
   res.render('auth/login', {
     path: '/login',
     pageTitle: 'Login',
-    isAuthenticated: false,
+    errorMessage: req.flash('error')
   });
 };
 
@@ -13,7 +13,6 @@ exports.getSignup = (req, res, next) => {
   res.render('auth/signup', {
     path: '/signup',
     pageTitle: 'Signup',
-    isAuthenticated: false
   });
 };
 
@@ -42,6 +41,7 @@ exports.postLogin = (req, res, next) => {
         res.redirect('/login');
       });
     } else {
+      req.flash('error', "Email doesn't exist");
       return res.redirect('/login');
     }
   })
