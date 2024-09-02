@@ -6,7 +6,7 @@ const mailgunTransport = require('nodemailer-mailgun-transport');
 
 const transporter = nodemailer.createTransport(mailgunTransport({
   auth: {
-    api_key: process.env.MAILGUN_XYZ,
+    test_key: process.env.MAILGUN_XYZ,
     domain: process.env.MAILGUN_DOMAIN
   }
 }))
