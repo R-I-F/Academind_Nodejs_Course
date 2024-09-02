@@ -1,5 +1,15 @@
 const User = require('../models/user');
 const bcrypt = require('bcryptjs');
+const nodemailer = require('nodemailer');
+require('dotenv').config();
+const mailgunTransport = require('nodemailer-mailgun-transport');
+
+const transporter = nodemailer.createTransport(mailgunTransport({
+  auth: {
+    api_key: process.env.MAILGUN_API_KEY,
+    domain: process.env.MAILGUN_DOMAIN
+  }
+}))
 
 exports.getLogin = (req, res, next) => {
   let errMssg = req.flash('error');
@@ -74,6 +84,17 @@ exports.postSignup = (req, res, next) => {
         return newUser.save()
       })
       .then((result)=>{
+      transporter.sendMail({
+        from: 'ibrahimrefaeei@gmail.com',
+        to: req.body.email,
+        subject: 'Account created',
+        text: 'Congratulations, You have just created a new account on academind node js course.'
+        }, (err, info)=>{
+          if(err){
+            return console.log(err);
+          }
+          console.log('Message sent: %s', info.messageId);
+      })
       res.redirect('/login');
     })
   }})
