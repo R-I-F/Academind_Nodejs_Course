@@ -2,10 +2,13 @@ const User = require('../models/user');
 const bcrypt = require('bcryptjs');
 
 exports.getLogin = (req, res, next) => {
+  let errMssg = req.flash('error');
+  errMssg.length? errMssg = errMssg[0] : errMssg = null ; 
+
   res.render('auth/login', {
     path: '/login',
     pageTitle: 'Login',
-    errorMessage: req.flash('error')
+    errorMessage: errMssg
   });
 };
 
@@ -33,6 +36,7 @@ exports.postLogin = (req, res, next) => {
           });
         }
         else {
+          req.flash('error', "Password is incorrect");
           return res.redirect('/login');
         }
       })
@@ -80,5 +84,16 @@ exports.postLogout = (req, res, next) => {
   req.session.destroy(err => {
     console.log(err);
     res.redirect('/');
+  });
+};
+
+exports.getReset = (req, res, next)=>{
+  let errMssg = req.flash('error');
+  errMssg.length? errMssg = errMssg[0] : errMssg = null ; 
+  
+  res.render('auth/reset', {
+    path: '/login',
+    pageTitle: 'Login',
+    errorMessage: errMssg
   });
 };
