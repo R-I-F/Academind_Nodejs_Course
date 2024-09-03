@@ -1,15 +1,14 @@
 const User = require('../models/user');
 const bcrypt = require('bcryptjs');
-const nodemailer = require('nodemailer');
+const { MailerSend, EmailParams, Sender, Recipient } = require('mailersend');
 require('dotenv').config();
-const mailgunTransport = require('nodemailer-mailgun-transport');
 
-const transporter = nodemailer.createTransport(mailgunTransport({
-  auth: {
-    api_key: process.env.MAILGUN_XYZ,
-    domain: process.env.MAILGUN_DOMAIN
-  }
-}))
+const mailerSend = new MailerSend({
+  apiKey: process.env.MAILERSEND_API_KEY 
+})
+
+const sentFrom = new Sender("ibrahim@trial-ynrw7gyj5xjg2k8e.mlsender.net", "Ibrahim");
+
 
 exports.getLogin = (req, res, next) => {
   let errMssg = req.flash('error');
@@ -84,17 +83,15 @@ exports.postSignup = (req, res, next) => {
         return newUser.save()
       })
       .then((result)=>{
-      transporter.sendMail({
-        from: 'ibrahimrefaeei@gmail.com',
-        to: req.body.email,
-        subject: 'Account created',
-        text: 'Congratulations, You have just created a new account on academind node js course.'
-        }, (err, info)=>{
-          if(err){
-            return console.log(err);
-          }
-          console.log('Message sent: %s', info.messageId);
-      })
+          const recipients = [ new Recipient(email, "Sir/Madam") ];
+          const emailParams = new EmailParams()
+            .setFrom(sentFrom)
+            .setTo(recipients)
+            .setReplyTo(sentFrom)
+            .setSubject('Account created')
+            .setText('Congratulations, You have just created a new account on academind node js shop.')
+          mailerSend.email.send(emailParams)
+            .then((result)=>{ console.log('mail sent'); }).catch((err) => { console.log(err); });
       res.redirect('/login');
     })
   }})
