@@ -1,5 +1,6 @@
 const User = require('../models/user');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 const { MailerSend, EmailParams, Sender, Recipient } = require('mailersend');
 require('dotenv').config();
 
@@ -113,5 +114,41 @@ exports.getReset = (req, res, next)=>{
     path: '/login',
     pageTitle: 'Login',
     errorMessage: errMssg
+  });
+};
+
+exports.postReset = (req, res, next)=>{
+  const email = req.body.email;
+  crypto.randomBytes(32, (err, buffer)=>{
+    if(err){
+      console.log(err);
+      return res.redirect('/reset');
+    }
+    const token = buffer.toString('hex');
+    User.findOne({email: email})
+      .then((user)=>{
+        if(!user){
+          req.flash('error','No user found');
+          return res.redirect('/reset');
+        }
+        const recipients = [ new Recipient(email, "Sir/Madam") ];
+        const emailParams = new EmailParams()
+            .setFrom(sentFrom)
+            .setTo(recipients)
+            .setReplyTo(sentFrom)
+            .setSubject('Account created')
+            .setHtml(`Please click the following link to reset the password: <a href='http://localhost:3000/reset/${token}'>Reset Password</a>`)
+          user.resetToken = token;
+          user.resetTokenExpiration = Date.now() + 3600000;
+          user.save()
+            .then((result)=>{
+              mailerSend.email.send(emailParams)
+                .then((result)=>{ 
+                  console.log('Mail sent');
+                })
+                .catch((err) => { console.log(err); });
+                return res.redirect('/reset');
+            })
+      })
   });
 };
