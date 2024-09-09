@@ -6,7 +6,7 @@ const { validationResult } = require('express-validator');
 const User = require('../models/user');
 
 const mailerSend = new MailerSend({
-  apiKey: process.env.MAILERSEND_API_KEY 
+  apiKey: process.env.MAILERSEND_API_KEY
 });
 const sentFrom = new Sender("ibrahim@trial-ynrw7gyj5xjg2k8e.mlsender.net", "Ibrahim");
 
@@ -75,48 +75,35 @@ exports.postSignup = (req, res, next) => {
   const confirmPassword = req.body.confirmPassword;
 
   const errors = validationResult(req)
-  if(!errors.isEmpty()){
-    console.log(errors.array());
+  if (!errors.isEmpty()) {
     return res.status(422).render('auth/signup', {
       path: '/signup',
       pageTitle: 'Signup',
       errorMessage: errors.array()[0].msg
     })
   }
-  User.findOne({ email: email })
-    .then(userDoc => {
-      if (userDoc) {
-        req.flash(
-          'error',
-          'E-Mail exists already, please pick a different one.'
-        );
-        return res.redirect('/signup');
-      }
-      return bcrypt
-        .hash(password, 12)
-        .then(hashedPassword => {
-          const user = new User({
-            email: email,
-            password: hashedPassword,
-            cart: { items: [] }
-          });
-          return user.save();
-        })
-        .then(result => {
-          res.redirect('/login');
-          const recipients = [ new Recipient(email, "Sir/Madam") ];
-          const emailParams = new EmailParams()
-            .setFrom(sentFrom)
-            .setTo(recipients)
-            .setReplyTo(sentFrom)
-            .setSubject('Account created')
-            .setText('Congratulations, You have just created a new account on academind node js shop.')
-          return mailerSend.email.send(emailParams)
-            .then((result)=>{ console.log('mail sent'); }).catch((err) => { console.log(err); });
-        })
-        .catch(err => {
-          console.log(err);
-        });
+  bcrypt
+    .hash(password, 12)
+    .then(hashedPassword => {
+      const user = new User({
+        email: email,
+        password: hashedPassword,
+        cart: { items: [] }
+      });
+      return user.save();
+    })
+    .then(result => {
+      res.redirect('/login');
+      const recipients = [new Recipient(email, "Sir/Madam")];
+      const emailParams = new EmailParams()
+        .setFrom(sentFrom)
+        .setTo(recipients)
+        .setReplyTo(sentFrom)
+        .setSubject('Account created')
+        .setText('Congratulations, You have just created a new account on academind node js shop.')
+      return mailerSend.email.send(emailParams)
+        .then((result) => { console.log('mail sent'); })
+        .catch((err) => { console.log(err); });
     })
     .catch(err => {
       console.log(err);
@@ -163,18 +150,18 @@ exports.postReset = (req, res, next) => {
       })
       .then(result => {
         res.redirect('/');
-        const recipients = [ new Recipient(req.body.email, "Sir/Madam") ];
+        const recipients = [new Recipient(req.body.email, "Sir/Madam")];
         const emailParams = new EmailParams()
-            .setFrom(sentFrom)
-            .setTo(recipients)
-            .setReplyTo(sentFrom)
-            .setSubject('Account created')
-            .setHtml(`Please click the following link to reset the password: <a href='http://localhost:3000/reset/${token}'>Reset Password</a>`)
+          .setFrom(sentFrom)
+          .setTo(recipients)
+          .setReplyTo(sentFrom)
+          .setSubject('Account created')
+          .setHtml(`Please click the following link to reset the password: <a href='http://localhost:3000/reset/${token}'>Reset Password</a>`)
         mailerSend.email.send(emailParams)
-        .then((result)=>{ 
-          console.log('Mail sent');
-        })
-        .catch((err) => { console.log(err); });
+          .then((result) => {
+            console.log('Mail sent');
+          })
+          .catch((err) => { console.log(err); });
       })
       .catch(err => {
         console.log(err);

@@ -1,4 +1,5 @@
 const express = require('express');
+const User = require('../models/user');
 const { check, body } = require('express-validator');
 
 const authController = require('../controllers/auth');
@@ -17,14 +18,23 @@ router.post('/signup',
             .isEmail()
             .withMessage('Please enter a valid E-mail')
             .custom((value, {req})=>{
-                if(value === 'hacker@gmail.com'){
-                    throw new Error('This is Email is banned!');
-                }
-                return true;
+                return User.findOne({ email: value })
+                .then(userDoc => {
+                  if (userDoc) {
+                    return Promise.reject('Email already exists, please pick a different Email');
+                  }
+                })
             }),
         body('password', 'the password has to be at least 5 characters and alphanumeric characters')
             .isLength({min: 5})
-            .isAlphanumeric()
+            .isAlphanumeric(),
+        check('confirmPassword')
+            .custom((value, {req})=>{
+                if(value !== req.body.password){
+                    throw new Error('Please make sure to confirm the password correctly');
+                }
+                return true;
+            })
     ], 
     authController.postSignup);
 
