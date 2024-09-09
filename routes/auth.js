@@ -1,5 +1,5 @@
 const express = require('express');
-const { check } = require('express-validator');
+const { check, body } = require('express-validator');
 
 const authController = require('../controllers/auth');
 
@@ -11,7 +11,22 @@ router.get('/signup', authController.getSignup);
 
 router.post('/login', authController.postLogin);
 
-router.post('/signup', check('email').isEmail().withMessage('Please enter a valid E-mail'), authController.postSignup);
+router.post('/signup', 
+    [
+        check('email')
+            .isEmail()
+            .withMessage('Please enter a valid E-mail')
+            .custom((value, {req})=>{
+                if(value === 'hacker@gmail.com'){
+                    throw new Error('This is Email is banned!');
+                }
+                return true;
+            }),
+        body('password', 'the password has to be at least 5 characters and alphanumeric characters')
+            .isLength({min: 5})
+            .isAlphanumeric()
+    ], 
+    authController.postSignup);
 
 router.post('/logout', authController.postLogout);
 
