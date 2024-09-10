@@ -12,10 +12,12 @@ router.get('/signup', authController.getSignup);
 
 router.post('/login', [
     body('email', 'Please make sure the Email is written in a correct format')
-        .isEmail(), 
+        .isEmail()
+        .normalizeEmail(), 
     body('password', 'Please make sure the password has a minimum of 5 characters and is alphanumeric')
         .isLength({min: 5})
         .isAlphanumeric()
+        .trim(),
 ], authController.postLogin);
 
 router.post('/signup', 
@@ -30,17 +32,20 @@ router.post('/signup',
                     return Promise.reject('Email already exists, please pick a different Email');
                   }
                 })
-            }),
+            })
+            .normalizeEmail(),  
         body('password', 'the password has to be at least 5 characters and alphanumeric characters')
             .isLength({min: 5})
+            .trim()   
             .isAlphanumeric(),
         check('confirmPassword')
+            .trim()
             .custom((value, {req})=>{
                 if(value !== req.body.password){
                     throw new Error('Please make sure to confirm the password correctly');
                 }
                 return true;
-            })
+            }),
     ], 
     authController.postSignup);
 
