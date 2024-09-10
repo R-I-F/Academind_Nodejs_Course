@@ -10,7 +10,13 @@ router.get('/login', authController.getLogin);
 
 router.get('/signup', authController.getSignup);
 
-router.post('/login', authController.postLogin);
+router.post('/login', [
+    body('email', 'Please make sure the Email is written in a correct format')
+        .isEmail(), 
+    body('password', 'Please make sure the password has a minimum of 5 characters and is alphanumeric')
+        .isLength({min: 5})
+        .isAlphanumeric()
+], authController.postLogin);
 
 router.post('/signup', 
     [
