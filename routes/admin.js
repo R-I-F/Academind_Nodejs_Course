@@ -4,6 +4,7 @@ const express = require('express');
 
 const adminController = require('../controllers/admin');
 const isAuth = require('../middleware/is-auth');
+const { check, body } = require('express-validator');
 
 const router = express.Router();
 
@@ -14,7 +15,27 @@ router.get('/add-product', isAuth, adminController.getAddProduct);
 router.get('/products', isAuth, adminController.getProducts);
 
 // /admin/add-product => POST
-router.post('/add-product', isAuth, adminController.postAddProduct);
+router.post('/add-product', isAuth, [
+    check('title')
+        .isLength({max: 30})
+        .custom((value, {req})=>{
+            if(!value.trim().length > 0){
+                throw new Error('Title must contain something');
+            }
+            return true;
+        }),
+    check('imageUrl', 'Please insert a valid url')
+        .isURL(),
+    check('price')
+        .isFloat(),
+    check('description')
+        .custom((value, { req })=>{
+            if(!value.trim().length > 0){
+                throw new Error('Description must be more than 3 characters');
+            }
+            return true;
+        })
+], adminController.postAddProduct);
 
 router.get('/edit-product/:productId', isAuth, adminController.getEditProduct);
 
