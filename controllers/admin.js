@@ -71,7 +71,8 @@ exports.getEditProduct = (req, res, next) => {
         path: '/admin/edit-product',
         editing: editMode,
         hasError: false,
-        product: product
+        product: product,
+        errorMessage: ''
       });
     })
     .catch(err => console.log(err));
@@ -98,7 +99,7 @@ exports.postEditProduct = (req, res, next) => {
         res.redirect('/admin/products');
       });
     })
-    .catch(err => console.log(err));
+    .catch(err => res.redirect('/500'));
 };
 
 exports.getProducts = (req, res, next) => {
