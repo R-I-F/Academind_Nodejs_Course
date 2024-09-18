@@ -19,7 +19,7 @@ router.post('/add-product', isAuth, [
     check('title')
         .isLength({max: 30})
         .custom((value, {req})=>{
-            if(!value.trim().length > 0){
+            if(value.trim().length === 0){
                 throw new Error('Title must contain something');
             }
             return true;
@@ -28,7 +28,7 @@ router.post('/add-product', isAuth, [
         .isFloat(),
     check('description')
         .custom((value, { req })=>{
-            if(!value.trim().length > 0){
+            if(value.trim().length <= 3){
                 throw new Error('Description must be more than 3 characters');
             }
             return true;

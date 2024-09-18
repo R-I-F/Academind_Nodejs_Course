@@ -8,6 +8,7 @@ const MongoDBStore = require('connect-mongodb-session')(session);
 const csrf = require('csurf');
 const flash = require('express-flash');
 const multer = require('multer');
+const fs = require('fs');
 
 const errorController = require('./controllers/error');
 const User = require('./models/user');
@@ -21,6 +22,25 @@ const store = new MongoDBStore({
 });
 const csrfProtection = csrf();
 
+const fileStorage = multer.diskStorage({
+  destination: (req, file, cb)=>{
+    const imagesDir = path.join(__dirname, 'images');
+    cb(null, imagesDir);
+  },
+  filename: (req, file, cb)=>{
+    const filename =  file.originalname;
+    cb(null, filename);
+  }
+});
+
+const fileFilter = (req, file, cb)=>{
+  if(file.mimetype === 'image/png' || file.mimetype === 'image/jpg'  || file.mimetype === 'image/jpeg'){
+    cb(null, true);
+  } else { 
+    cb(null, false); 
+  }
+};
+
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 
@@ -29,7 +49,9 @@ const shopRoutes = require('./routes/shop');
 const authRoutes = require('./routes/auth');
 
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(multer({dest:'images'}).single('image'));
+
+app.use(multer({storage: fileStorage, fileFilter: fileFilter}).single('image'));
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(
   session({
@@ -39,6 +61,7 @@ app.use(
     store: store
   })
 );
+
 app.use(csrfProtection);
 app.use(flash());
 
@@ -76,7 +99,7 @@ app.get('/500', errorController.get500);
 app.use(errorController.get404);
 
 app.use((error, req, res, next)=>{
-  res.status(error.httpStatusCode).render('500',{
+  res.status(500).render('500',{
         pageTitle: 'Technical Error',
         path: '/500',
         isAuthenticated: false
@@ -89,5 +112,4 @@ mongoose
     app.listen(3000);
   })
   .catch(err => {
-    console.log(err);
   });
