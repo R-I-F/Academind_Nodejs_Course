@@ -7,6 +7,7 @@ const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 const csrf = require('csurf');
 const flash = require('express-flash');
+const multer = require('multer');
 
 const errorController = require('./controllers/error');
 const User = require('./models/user');
@@ -28,6 +29,7 @@ const shopRoutes = require('./routes/shop');
 const authRoutes = require('./routes/auth');
 
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(multer({dest:'images'}).single('image'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(
   session({
@@ -76,7 +78,8 @@ app.use(errorController.get404);
 app.use((error, req, res, next)=>{
   res.status(error.httpStatusCode).render('500',{
         pageTitle: 'Technical Error',
-        path: '/500'
+        path: '/500',
+        isAuthenticated: false
   });
 });
 

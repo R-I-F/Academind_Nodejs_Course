@@ -24,8 +24,6 @@ router.post('/add-product', isAuth, [
             }
             return true;
         }),
-    check('imageUrl', 'Please insert a valid url')
-        .isURL(),
     check('price')
         .isFloat(),
     check('description')
