@@ -21,6 +21,22 @@ exports.postAddProduct = (req, res, next) => {
 
   console.log(image);
 
+  if(!image){
+    return res.status(422).render('admin/edit-product', {
+      pageTitle: 'Add Product',
+      path: '/admin/add-product',
+      editing: false,
+      hasError: true,
+      product: {
+        title: title,
+        price: price,
+        description: description,
+        userId: req.user
+      },
+      errorMessage: 'image file doesnt have the correct extension'
+    });
+  }
+
   const errors = validationResult(req)
   if(!errors.isEmpty()){
     return res.render('admin/edit-product', {
@@ -32,7 +48,6 @@ exports.postAddProduct = (req, res, next) => {
         title: title,
         price: price,
         description: description,
-        imageUrl: imageUrl,
         userId: req.user
       },
       errorMessage: errors.array()[0].msg
@@ -44,7 +59,7 @@ exports.postAddProduct = (req, res, next) => {
     title: title,
     price: price,
     description: description,
-    imageUrl: imageUrl,
+    imageUrl: image.path,
     userId: req.user
   });
   product
@@ -91,7 +106,7 @@ exports.postEditProduct = (req, res, next) => {
   const prodId = req.body.productId;
   const updatedTitle = req.body.title;
   const updatedPrice = req.body.price;
-  const updatedImageUrl = req.body.imageUrl;
+  const image = req.file;
   const updatedDesc = req.body.description;
 
   Product.findById(prodId)
@@ -102,7 +117,9 @@ exports.postEditProduct = (req, res, next) => {
       product.title = updatedTitle;
       product.price = updatedPrice;
       product.description = updatedDesc;
-      product.imageUrl = updatedImageUrl;
+      if(image){
+        product.imageUrl = image.path;
+      }
       return product.save().then(result => {
         console.log('UPDATED PRODUCT!');
         res.redirect('/admin/products');
