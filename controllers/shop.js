@@ -149,12 +149,27 @@ exports.getInvoice = (req, res, next)=>{
   const orderId = req.params.orderId;
   const fileName = 'invoice-' + orderId + '.pdf';
   const filePath = path.join('data', 'invoices', fileName);
-  fs.readFile(filePath, (err, data)=>{
-    if(err){
-      return next(err);
-    }
-    res.setHeader('content-type','application/pdf');
-    res.setHeader('content-disposition',`inline; filename=${fileName}`);
-    res.send(data);
-  })
+
+  Order.findById(orderId)
+    .then((order) => {
+      if(!order){
+        return next(new Error('order not found'));
+      } else {
+        if(order.user.userId !== req.user._id.toString()){
+          return next(new Error('order does not belong to user'));
+        } else {
+          fs.readFile(filePath, (err, data)=>{
+            if(err){
+              return next(err);
+            }
+            res.setHeader('content-type','application/pdf');
+            res.setHeader('content-disposition',`inline; filename=${fileName}`);
+            res.send(data);
+          })
+        }
+      }
+    })
+    .catch((err) => { console.log(err); });
+
+
 }
