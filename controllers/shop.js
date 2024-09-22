@@ -155,21 +155,15 @@ exports.getInvoice = (req, res, next)=>{
       if(!order){
         return next(new Error('order not found'));
       } else {
-        if(order.user.userId !== req.user._id.toString()){
+        if(order.user.userId.toString() !== req.user._id.toString()){
           return next(new Error('order does not belong to user'));
         } else {
-          fs.readFile(filePath, (err, data)=>{
-            if(err){
-              return next(err);
-            }
+          const file = fs.createReadStream(filePath);
             res.setHeader('content-type','application/pdf');
             res.setHeader('content-disposition',`inline; filename=${fileName}`);
-            res.send(data);
-          })
+            file.pipe(res);
         }
       }
     })
     .catch((err) => { console.log(err); });
-
-
 }
