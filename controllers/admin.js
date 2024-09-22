@@ -1,5 +1,6 @@
 const Product = require('../models/product');
 const { validationResult } = require('express-validator');
+const path = require('path');
 
 exports.getAddProduct = (req, res, next) => {
   res.render('admin/edit-product', {
@@ -59,7 +60,7 @@ exports.postAddProduct = (req, res, next) => {
     title: title,
     price: price,
     description: description,
-    imageUrl: image.path,
+    imageUrl: path.relative(__dirname ,image.path),
     userId: req.user
   });
   product
@@ -118,7 +119,7 @@ exports.postEditProduct = (req, res, next) => {
       product.price = updatedPrice;
       product.description = updatedDesc;
       if(image){
-        product.imageUrl = image.path;
+        product.imageUrl = path.relative(__dirname ,image.path);
       }
       return product.save().then(result => {
         console.log('UPDATED PRODUCT!');
