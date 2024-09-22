@@ -2,6 +2,7 @@ const Product = require('../models/product');
 const Order = require('../models/order');
 const path = require('path');
 const fs = require('fs');
+const PDFDocument = require('pdfkit');
 
 exports.getProducts = (req, res, next) => {
   Product.find()
@@ -158,10 +159,23 @@ exports.getInvoice = (req, res, next)=>{
         if(order.user.userId.toString() !== req.user._id.toString()){
           return next(new Error('order does not belong to user'));
         } else {
-          const file = fs.createReadStream(filePath);
-            res.setHeader('content-type','application/pdf');
-            res.setHeader('content-disposition',`inline; filename=${fileName}`);
-            file.pipe(res);
+          const pdfDoc = new PDFDocument();
+
+          res.setHeader('content-type','application/pdf');
+          res.setHeader('content-disposition',`inline; filename=${fileName}`);
+
+          pdfDoc.pipe(fs.createWriteStream(filePath));
+          pdfDoc.pipe(res);
+          pdfDoc.fontSize(26).text('Invoice',{underline: true});
+          pdfDoc.text('-------------------');
+          let totalPrice = 0;
+          order.products.forEach(prod=>{
+            pdfDoc.fontSize(14).text(`${prod.product.title} x ${prod.quantity}`);
+            totalPrice += prod.product.price * prod.quantity;
+          });
+          pdfDoc.fontSize(26).text('-------------------');
+          pdfDoc.fontSize(16).text(`Total:  ${totalPrice}`,{});
+          pdfDoc.end();       
         }
       }
     })
