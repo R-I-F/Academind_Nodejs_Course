@@ -153,6 +153,8 @@ exports.getInvoice = (req, res, next)=>{
     if(err){
       return next(err);
     }
+    res.setHeader('content-type','application/pdf');
+    res.setHeader('content-disposition',`inline; filename=${fileName}`);
     res.send(data);
   })
 }
